@@ -1,0 +1,27 @@
+
+# Maintainer: Jack Johannesen
+
+pkgname=fshuf
+pkgver=2.1.0
+pkgrel=3
+pkgdesc="Shuffles files in a directory by adding, modifying, or removing a prefix."
+arch=('i686' 'x86_64' 'x64')
+url="https://github.com/K4rakara/dotfiles"
+license=('MIT')
+depends=()
+makedepends=('cargo')
+provides=('fshuf')
+source=()
+md5sums=()
+
+build() {
+	cd $srcdir/../../../fshuf/;
+	cargo build --release;
+}
+
+package() {
+	install -Dm755 \
+		$srcdir/../../../fshuf/target/release/fshuf \
+		$pkgdir/usr/bin/fshuf;
+}
+

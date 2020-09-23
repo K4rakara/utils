@@ -3,10 +3,10 @@
 
 pkgname=jsgrep
 pkgver=0.0.4
-pkgrel=4
+pkgrel=5
 pkgdesc="Grep, but JavaScript."
 arch=('i686' 'x86_64' 'x64')
-url="https://github.com/K4rakara/dotfiles"
+url="https://github.com/K4rakara/utils"
 license=('MIT')
 depends=('nodejs')
 makedepends=('just' 'yarn' 'nodejs')

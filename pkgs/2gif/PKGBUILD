@@ -20,7 +20,7 @@ build() {
 
 package() {
 	install -Dm755 \
-		$srcdir/../../../2gif/2gif.rb \
+		$srcdir/../../../../2gif/2gif.rb \
 		$pkgdir/usr/bin/2gif;
 }
 

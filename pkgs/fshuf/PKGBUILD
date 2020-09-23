@@ -15,13 +15,13 @@ source=()
 md5sums=()
 
 build() {
-	cd $srcdir/../../../fshuf/;
+	cd $srcdir/../../../../fshuf/;
 	cargo build --release;
 }
 
 package() {
 	install -Dm755 \
-		$srcdir/../../../fshuf/target/release/fshuf \
+		$srcdir/../../../../fshuf/target/release/fshuf \
 		$pkgdir/usr/bin/fshuf;
 }
 

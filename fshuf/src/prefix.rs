@@ -38,7 +38,7 @@ mod test_decimal_char {
 	#[test]
 	fn test_generate() {
 		let gen = DecimalChar::new();
-		for i in 0..64 { assert!(gen.can_output(gen.generate())); }
+		for _ in 0..64 { assert!(gen.can_output(gen.generate())); }
 	}
 }
 
@@ -65,40 +65,7 @@ mod test_binary_char {
 	#[test]
 	fn test_generate() {
 		let gen = BinaryChar::new();
-		for i in 0..64 { assert!(gen.can_output(gen.generate())); }
-	}
-}
-
-pub(crate) struct Base64Char;
-
-impl Base64Char { pub fn new() -> Self { Base64Char } }
-
-pub static BASE64: &'static str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+=";
-
-impl PrefixChar for Base64Char {
-	fn generate(&self) -> char {
-		let i = (random::<f32>() * (BASE64.len() - 1) as f32).round() as usize;
-		BASE64[i..].chars().next().unwrap()
-	}
-	fn can_output(&self, v: char) -> bool { BASE64.contains(&format!("{}", v)) }
-}
-
-
-#[cfg(test)]
-mod test_base64_char {
-	use super::Base64Char;
-	use super::PrefixChar;
-	use super::BASE64;
-	#[test]
-	fn test_can_output() {
-		let gen = Base64Char::new();
-		let mut chars = BASE64.chars();
-		while let Some(this_char) = chars.next() { assert!(gen.can_output(this_char)); }
-	}
-	#[test]
-	fn test_generate() {
-		let gen = Base64Char::new();
-		for i in 0..256 { assert!(gen.can_output(gen.generate())); }
+		for _ in 0..64 { assert!(gen.can_output(gen.generate())); }
 	}
 }
 
@@ -114,7 +81,6 @@ impl Prefix {
 				match this_char {
 					'd' => { to_return.push(Box::new(DecimalChar::new())); }
 					'b' => { to_return.push(Box::new(BinaryChar::new())); }
-					'B' => { to_return.push(Box::new(Base64Char::new())); }
 					e => { panic!(format!("Invalid suffix pattern character \"{}\". This should have been caught earlier on.", e)); }
 				}
 			}
@@ -157,26 +123,11 @@ mod test_prefix {
 			assert!(prefix.can_output(&String::from("1111")));
 			assert_eq!(prefix.can_output(&String::from("0002")), false);
 		}
-		{
-			let prefix = Prefix::new_from(&String::from("BBBB"));
-			assert!(prefix.can_output(&String::from("abcd")));
-			assert!(prefix.can_output(&String::from("efgh")));
-			assert!(prefix.can_output(&String::from("ijkl")));
-			assert!(prefix.can_output(&String::from("mnop")));
-			assert!(prefix.can_output(&String::from("qrst")));
-			assert!(prefix.can_output(&String::from("vwxy")));
-			assert!(prefix.can_output(&String::from("zABC")));
-			assert!(prefix.can_output(&String::from("DEFG")));
-			assert!(prefix.can_output(&String::from("HIJK")));
-			assert!(prefix.can_output(&String::from("LMNO")));
-			assert!(prefix.can_output(&String::from("PQRS")));
-			assert!(prefix.can_output(&String::from("TUVW")));
-			assert!(prefix.can_output(&String::from("XY+=")));
-		}
 	}
 	#[test]
 	fn test_generate() {
-		let prefix = Prefix::new_from(&String::from("dbB"));
-		for i in 0..512 { assert!(prefix.can_output(&prefix.generate())); }
+		let prefix = Prefix::new_from(&String::from("db"));
+		for _ in 0..512 { assert!(prefix.can_output(&prefix.generate())); }
 	}
 }
+

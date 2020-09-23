@@ -15,13 +15,13 @@ source=()
 md5sums=()
 
 build() {
-	cd $srcdir/../../../../round-time-up/;
+	cd $srcdir/../../../cli/round-time-up/;
 	just;
 }
 
 package() {
 	install -Dm755 \
-		$srcdir/../../../../round-time-up/round-time-up \
+		$srcdir/../../../cli/round-time-up/round-time-up \
 		$pkgdir/usr/bin/round-time-up;
 }
 

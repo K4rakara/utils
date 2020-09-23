@@ -15,13 +15,13 @@ source=()
 md5sums=()
 
 build() {
-	cd $srcdir/../../../jsgrep;
+	cd $srcdir/../../../cli/jsgrep;
 	just;
 }
 
 package() {
 	install -Dm755 \
-		$srcdir/../../../jsgrep/jsgrep \
+		$srcdir/../../../cli/jsgrep/jsgrep \
 		$pkgdir/usr/bin/jsgrep;
 }
 

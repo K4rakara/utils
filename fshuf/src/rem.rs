@@ -114,11 +114,13 @@ pub(crate) fn rem(prefix: Option<String>) {
 	}
     for entry in to_rename.iter() {
         // Try to rename the file to `new_file_name`, and handle errors if they occur.
-		let try_rename = fs::rename(&entry.0, Path::new(&entry.1));
-		if try_rename.is_err() {
-			println!("\u{001b}[38;5;3mWarning:\u{001b}[0m Failed to rename \"{from}\" to \"{to}\".",
-				from = &entry.0,
-			    to = &entry.1);
+		match fs::rename(&entry.0, Path::new(&entry.1)) {
+			Ok(_) => (),
+            Err(_) => {
+                println!("\u{001b}[38;5;3mWarning:\u{001b}[0m Failed to rename \"{from}\" to \"{to}\".",
+				    from = &entry.0,
+			        to = &entry.1);
+            }
 		}
     }
 	if using_fshuf_file { match fs::remove_file(pwd.join(".fshuf")) { Ok(_) => (), Err(_) => (), }; }

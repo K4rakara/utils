@@ -1,0 +1,27 @@
+
+# Maintainer: Jack Johannesen
+
+pkgname=round-time-up
+pkgver=0.0.2
+pkgrel=2
+pkgdesc="Pipe a time formatted as hh:mm:ss.ms and this tool will round it to the nearest second."
+arch=('i686' 'x86_64' 'x64')
+url="https://github.com/K4rakara/dotfiles"
+license=('MIT')
+depends=('nodejs')
+makedepends=('just' 'yarn' 'nodejs')
+provides=('round-time-up')
+source=()
+md5sums=()
+
+build() {
+	cd $srcdir/../../../round-time-up/;
+	just;
+}
+
+package() {
+	install -Dm755 \
+		$srcdir/../../../round-time-up/round-time-up \
+		$pkgdir/usr/bin/round-time-up;
+}
+

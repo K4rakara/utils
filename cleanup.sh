@@ -14,5 +14,9 @@ cd ../../;
 cd ./cli/round-time-up/;
 rm -rf ./node_modules/;
 rm ./round-time-up;
-rm -rf
+cd ../../;
+
+cd ./cli/openweatherbar/;
+rm -rf ./target/;
+cd ../../;
 

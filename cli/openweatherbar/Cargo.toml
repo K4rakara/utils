@@ -1,0 +1,12 @@
+[package]
+name = "openweatherbar"
+version = "0.1.0"
+authors = ["Jack Johannesen <jack@insertdomain.name>"]
+edition = "2018"
+
+[dependencies]
+clap = "2.33.3"
+reqwest = { version = "0.10.8", features = [ "blocking", "json" ] }
+serde_json = "1.0.57"
+chrono = "0.4.17"
+

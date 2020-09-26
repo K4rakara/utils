@@ -1,0 +1,27 @@
+
+# Maintainer: Jack Johannesen
+
+pkgname=openweatherbar
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="A faster version of openweatherbar-fullfeatured written in Rust."
+arch=('i686' 'x86_64' 'x64')
+url="https://github.com/K4rakara/utils"
+license=('MIT')
+depends=()
+makedepends=('cargo')
+provides=('openweatherbar')
+source=()
+md5sums=()
+
+build() {
+	cd $srcdir/../../../cli/openweatherbar/;
+	cargo build --release;
+}
+
+package() {
+	install -Dm755 \
+		$srcdir/../../../cli/openweatherbar/target/release/openweatherbar \
+		$pkgdir/usr/bin/openweatherbar;
+}
+

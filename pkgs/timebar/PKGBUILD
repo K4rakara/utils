@@ -1,0 +1,27 @@
+
+# Maintainer: Jack Johannesen
+
+pkgname=timebar
+pkgver=0.1.0
+pkgrel=1
+pkgdesc=""
+arch=('i686' 'x86_64' 'x64')
+url="https://github.com/K4rakara/utils"
+license=('MIT')
+depends=()
+makedepends=('cargo')
+provides=('timebar')
+source=()
+md5sums=()
+
+build() {
+	cd $srcdir/../../../cli/timebar/;
+	cargo build --release;
+}
+
+package() {
+	install -Dm755 \
+		$srcdir/../../../cli/timebar/target/release/timebar \
+		$pkgdir/usr/bin/timebar;
+}
+

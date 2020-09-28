@@ -1,0 +1,10 @@
+[package]
+name = "timebar"
+version = "0.1.0"
+authors = ["Jack Johannesen <jack@insertdomain.name>"]
+edition = "2018"
+
+[dependencies]
+chrono = "0.4.18"
+num-traits = "0.2.12"
+

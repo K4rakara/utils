@@ -20,19 +20,16 @@ fn main() {
     let dom = now.day();
 
     let dom_suffix = {
-        let dom_string = format!("{}", dom);
-        let (last_char, second_to_last_char) = {
-            let mut chars = dom_string.chars().rev();
-            (chars.next().unwrap(), chars.next().unwrap_or('0'))
-        };
-        match second_to_last_char {
-            '1' => "th", 
-            ___ => {
-                match last_char {
-                    '1' => "st",
-                    '2' => "nd",
-                    '3' => "rd",
-                    ___ => "th",
+        let last_digit = dom % 10;
+        let second_to_last_digit = (dom / 10) % 10;
+        match second_to_last_digit {
+            1 => "th", 
+            _ => {
+                match last_digit {
+                    1 => "st",
+                    2 => "nd",
+                    3 => "rd",
+                    _ => "th",
                 }
             }
         }

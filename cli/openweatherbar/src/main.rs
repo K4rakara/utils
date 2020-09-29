@@ -68,7 +68,7 @@ impl TryFrom<Value> for BasicInfo {
                                     Value::Number(temp) => to_return.temp = temp.as_f64().unwrap(),
                                     _ => return Err(()),
                                 }
-                                None => error(),
+                                None => return Err(()),
                             }
                             match main.get("feels_like") {
                                 Some(feels_like) => match feels_like { 
@@ -139,7 +139,11 @@ fn get_icon(i: &str) -> &'static str {
     }
 }
 
-fn error() -> ! {
+fn error<E: fmt::Display>(e: E) -> ! {
+    match write("/tmp/openweatherbar-error", format!("{}", e)) {
+        Ok(_) => (),
+        Err(_) => (),
+    }
     print!("󰀦");
     exit(1);
 }
@@ -199,7 +203,7 @@ fn main() {
         Some(v) => String::from(v),
         None    => match read_to_string(home.join(".config/api-keys/openweather")) {
             Ok(v)  => v,
-            Err(_) => error(),
+            Err(e) => error(e),
         },
     };
 
@@ -207,7 +211,7 @@ fn main() {
         Some(v) => String::from(v),
         None    => match read_to_string(home.join(".config/location")) {
             Ok(v)  => v,
-            Err(_) => error(),
+            Err(e) => error(e),
         }
     };
 
@@ -215,6 +219,8 @@ fn main() {
         Some(v) => Units::from(v),
         None    => Units::Metric,
     };
+
+    let none_err = "Unwrapped None value.";
 
     // Make API requests.
 
@@ -239,31 +245,31 @@ fn main() {
                                     match sys.get("sunrise") {
                                         Some(sun_rise) => match sun_rise {
                                             Value::Number(sun_rise) => _sun_rise = sun_rise.as_i64().unwrap(),
-                                            _ => error(),
+                                            _ => error("Expected Value::Number"),
                                         }
-                                        None => error(),
+                                        None => error(none_err),
                                     }
                                     match sys.get("sunset") {
                                         Some(sun_set) => match sun_set {
                                             Value::Number(sun_set) => _sun_set = sun_set.as_i64().unwrap(),
-                                            _ => error(),
+                                            _ => error("Expected Value::Number"),
                                         }
-                                        None => error(),
+                                        None => error(none_err),
                                     }
                                 }
-                                _ => error(),
+                                _ => error(none_err),
                             }
-                            None => error(),
+                            None => error(none_err),
                         }
                         match BasicInfo::try_from(json) {
                             Ok(current) => current,
-                            Err(_) => error(),
+                            Err(_) => error("Deserialization error."),
                         }
                     }
-                    Err(_) => error(),
+                    Err(e) => error(Box::new(e)),
                 }
             }
-            Err(_) => error(),
+            Err(e) => error(Box::new(e)),
         }
     };
 
@@ -282,20 +288,20 @@ fn main() {
                                 Value::Array(list) => match list.get(0) {
                                     Some(obj) => match BasicInfo::try_from(obj.clone()) {
                                         Ok(forecast) => forecast,
-                                        Err(_) => error(),
+                                        Err(_) => error("Deserialization error."),
                                     }
-                                    None => error(),
+                                    None => error(none_err),
                                 }
-                                _ => error(),
+                                _ => error("Expected Value::Array."),
                             }
-                            None => error(),
+                            None => error(none_err),
                         },
-                        _ => error(),
+                        _ => error("Expected Value::Object."),
                     },
-                    Err(_)   => error(),
+                    Err(e)   => error(e),
                 }
             }
-            Err(_) => error(),
+            Err(e) => error(e),
         }
     };
 

@@ -20,3 +20,7 @@ cd ./cli/openweatherbar/;
 rm -rf ./target/;
 cd ../../;
 
+cd ./cli/timebar/;
+rm -rf ./target/;
+cd ../../;
+

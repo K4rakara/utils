@@ -1,10 +1,14 @@
 extern crate chrono;
 extern crate num_traits;
 
+use std::thread::{ sleep };
+use std::env::{ args };
+use std::time::{ Duration };
+
 use chrono::prelude::*;
 use num_traits::{ FromPrimitive };
 
-fn main() {
+fn update() {
     let now = Local::now();
 
     let month = {
@@ -35,7 +39,7 @@ fn main() {
         }
     };
 
-    print!("{dow}, {month} {dom}{dom_suffix}, {year} -- {hour:02}:{minute:02}{ampm}",
+    println!("{dow}, {month} {dom}{dom_suffix}, {year} -- {hour:02}:{minute:02}{ampm}",
         dow        = now.weekday(),
         month      = month,
         dom        = dom,
@@ -45,4 +49,17 @@ fn main() {
         minute     = now.minute(),
         ampm       = if now.hour12().0 { "PM" } else { "AM" });
 }
+
+fn main() {
+    let args = args().collect::<Vec<String>>();
+    if args.len() >= 2 && args[1] == "tail" {
+        loop {
+            update();
+            sleep(Duration::from_millis(1000));
+        }
+    } else {
+        update();
+    }
+}
+
 

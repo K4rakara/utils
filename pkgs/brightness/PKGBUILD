@@ -1,0 +1,27 @@
+
+# Maintainer: Jack Johannesen
+
+pkgname=brightness
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="A brightness cli utility for Linux"
+arch=('i686' 'x86_64' 'x64')
+url="https://github.com/K4rakara/utils"
+license=('MIT')
+depends=()
+makedepends=('cargo')
+provides=('brightness')
+source=()
+md5sums=()
+
+build() {
+	cd $srcdir/../../../cli/brightness/;
+	cargo build --release;
+}
+
+package() {
+	install -Dm755 \
+		$srcdir/../../../cli/brightness/target/release/brightness \
+		$pkgdir/usr/bin/brightness;
+}
+

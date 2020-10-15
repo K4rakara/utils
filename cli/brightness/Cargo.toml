@@ -1,0 +1,9 @@
+[package]
+name = "brightness"
+version = "0.1.0"
+authors = ["Jack Johannesen <jack@insertdomain.name>"]
+edition = "2018"
+
+[dependencies]
+regex = "1.4"
+

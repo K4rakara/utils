@@ -1,7 +1,6 @@
 extern crate clap;
 extern crate reqwest;
 extern crate serde_json;
-extern crate chrono;
 
 use std::fmt;
 use std::env::{ var };
@@ -9,9 +8,10 @@ use std::path::{ Path };
 use std::fs::{ read_to_string, write };
 use std::process::{ exit };
 use std::convert::{ TryFrom };
+use std::time::{ Duration };
+use std::thread::{ sleep };
 
 use serde_json::{ Value };
-use chrono::{ Utc };
 
 static API: &'static str = "https://api.openweathermap.org/data/2.5";
 
@@ -187,6 +187,11 @@ fn main() {
             .value_name("SYMBOL")
             .help("The symbol to use as a suffix after the temperature values. Ex: \"°\".")
             .takes_value(true))
+        .arg(clap::Arg::with_name("tail")
+            .short("-t")
+            .long("tail")
+            .help("Start the tool in tail mode. This also enables waiting for network related daemons to start.")
+            .takes_value(false))
         .get_matches();
 
     // Get values from clap.
@@ -195,8 +200,8 @@ fn main() {
         .join(var("USER").unwrap_or(String::new()));
     
     let symbol = match matches.value_of("symbol") {
-        Some(v) => v,
-        None => "°",
+        Some(v) => String::from(v),
+        None => String::from("°"),
     };
 
     let key = match matches.value_of("key") {
@@ -220,14 +225,29 @@ fn main() {
         None    => Units::Metric,
     };
 
+    let tail = matches.is_present("tail");
+
+    if !tail {
+        update(&symbol, &key, &city, &units);
+    } else {
+        // Wait for networking daemons to start.
+        loop {
+            match reqwest::blocking::get("http://www.example.com") {
+                Ok(_) => break,
+                Err(_) => sleep(Duration::from_millis(1000 * 20)),
+            }
+        }
+        loop {
+            update(&symbol, &key, &city, &units);
+            sleep(Duration::from_millis(1000 * 60 * 10));
+        }
+    }
+}
+
+fn update(symbol: &str, key: &str, city: &str, units: &Units) {
     let none_err = "Unwrapped None value.";
 
     // Make API requests.
-
-    // Thes time to sunrise/sunset feature is unimplemented because I dont use it lol.
-    let _sun_rise;
-    let _sun_set;
-    let _now = Utc::now().timestamp();
 
     let current = {
         let try_current = reqwest::blocking::get(&format!("{api}/weather?appid={key}&q={city}&units={units}",
@@ -238,33 +258,9 @@ fn main() {
         match try_current {
             Ok(current) => {
                 match current.json::<Value>() {
-                    Ok(json) => {
-                        match json.get("sys") {
-                            Some(sys) => match sys {
-                                Value::Object(sys) => {
-                                    match sys.get("sunrise") {
-                                        Some(sun_rise) => match sun_rise {
-                                            Value::Number(sun_rise) => _sun_rise = sun_rise.as_i64().unwrap(),
-                                            _ => error("Expected Value::Number"),
-                                        }
-                                        None => error(none_err),
-                                    }
-                                    match sys.get("sunset") {
-                                        Some(sun_set) => match sun_set {
-                                            Value::Number(sun_set) => _sun_set = sun_set.as_i64().unwrap(),
-                                            _ => error("Expected Value::Number"),
-                                        }
-                                        None => error(none_err),
-                                    }
-                                }
-                                _ => error(none_err),
-                            }
-                            None => error(none_err),
-                        }
-                        match BasicInfo::try_from(json) {
-                            Ok(current) => current,
-                            Err(_) => error("Deserialization error."),
-                        }
+                    Ok(json) => match BasicInfo::try_from(json) {
+                        Ok(current) => current,
+                        Err(_) => error("Deserialization error."),
                     }
                     Err(e) => error(Box::new(e)),
                 }
@@ -306,12 +302,12 @@ fn main() {
     };
 
     let trend =
-        if current.temp > forecast.temp { "" }
-        else if current.temp < forecast.temp { "" }
+        if current.temp.round() > forecast.temp.round() { "" }
+        else if current.temp.round() < forecast.temp.round() { "" }
         else { "" };
 
     // Print out the fetched info.
-    print!("{} {}{} {} {} {}{}",
+    println!("{} {}{} {} {} {}{}",
         get_icon(&current.icon),
         current.temp.round() as i32,
         symbol,

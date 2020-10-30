@@ -1,0 +1,21 @@
+/* Error: @function rules may not contain style rules.
+ *    ,
+ * 34 | /                 :root {
+ * 35 | |                     --yewi--colors__primary--alpha-#{$a}: #{color.change($primary, $alpha: $a)};
+ * 36 | \                 }
+ *    '
+ *   ../yewi-lib/src/sass/colors/palette.scss 34:5  @forward
+ *   ../yewi-lib/src/sass/colors/index.scss 18:1    @forward
+ *   ../yewi-lib/src/sass/index.scss 4:1            @use
+ *   src/state/ui/styles/main.scss 3:1              root stylesheet */
+
+body::before {
+  font-family: "Source Code Pro", "SF Mono", Monaco, Inconsolata, "Fira Mono",
+      "Droid Sans Mono", monospace, monospace;
+  white-space: pre;
+  display: block;
+  padding: 1em;
+  margin-bottom: 1em;
+  border-bottom: 2px solid black;
+  content: "Error: @function rules may not contain style rules.\a    \2577 \a 34 \2502  \250c                  :root {\a 35 \2502  \2502                      --yewi--colors__primary--alpha-#{$a}: #{color.change($primary, $alpha: $a)};\a 36 \2502  \2514                  }\a    \2575 \a   ../yewi-lib/src/sass/colors/palette.scss 34:5  @forward\a   ../yewi-lib/src/sass/colors/index.scss 18:1    @forward\a   ../yewi-lib/src/sass/index.scss 4:1            @use\a   src/state/ui/styles/main.scss 3:1              root stylesheet";
+}

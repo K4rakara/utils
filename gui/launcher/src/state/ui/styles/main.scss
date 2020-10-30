@@ -1,0 +1,127 @@
+
+@use "sass:color";
+@use "../../../../../yewi-lib/src/sass" as yewi with ( $yewi-mode: static );
+@import url(resource:///org/gtk/libgtk/theme/Adwaita/gtk-contained-dark.css);
+
+rubberband {
+	border: none;
+	background: none;
+}
+
+scrollbar {
+	border: none;
+	background: none;
+	box-shadow: none;
+}
+
+tooltip {
+	border: none;
+	border-radius: 16px;
+	&.background {
+		border: none;
+		background-color: yewi.elevation(1);
+	}
+}
+
+@keyframes ripple {
+	to {
+		background-size: 1000% 1000%;
+	}
+}
+
+button {
+	border: none;
+	outline: none;
+	background-color: yewi.elevation(2);
+	background-image:
+		radial-gradient(
+			circle,
+			transparent 10%,
+			transparent 0%);
+	background-size: 0% 0%;
+	background-repeat: no-repeat;
+	background-position: center;
+	transition-property: background-size, background-image;
+	transition-duration: .25s, .25s;
+	transition-timing-function: ease-out;
+	box-shadow: none;
+	&:hover {
+		background-color: yewi.elevation(2);
+		background-image:
+			radial-gradient(
+				circle,
+				color.change(yewi.elevation(0), $alpha: (1 / 15)) 10%,
+				transparent 0%);
+	}
+	&:active {
+		background-color: yewi.elevation(3);
+		background-size: 1000% 1000%;
+		transition-duration: .25s, 0s;
+		animation-name: ripple;
+		animation-duration: .25s;
+		animation-timing-function: ease-out;
+		animation-fill-mode: forwards;
+	}
+}
+
+#application-list {
+	& #header-box {
+		& #header {
+			padding-left: 8px;
+			padding-bottom: 4px;
+		}
+	}
+}
+
+#application-button {
+	border: none;
+	border-radius: 0;
+	background-color: yewi.elevation(1);
+	border-top-right-radius: 16px;
+	border-bottom-right-radius: 16px;
+	box-shadow: none;
+	&:hover { background-color: yewi.elevation(2); }
+	&:active { background-color: yewi.elevation(2); }
+}
+
+#action-button { border-radius: 50%; }
+
+#root {
+	padding: 8px;
+	background-color: yewi.elevation(1);
+	border: yewi.elevation(0) solid 4px;
+	border-radius: 16px;
+	font-family: 'Roboto', sans-serif;
+	& #top #ctx { font-family: 'Fira Code', 'Roboto', sans-serif; }
+	& #bot {
+		& #notebook {
+			border: none;
+			border-radius: 16px;
+			background-color: yewi.elevation(1);
+			& header {
+				border-radius: 16px;
+				border-color: yewi.elevation(2);
+				& tabs {
+					border-radius: 16px;
+					background-color: yewi.elevation(2);
+					& tab {
+						padding-top: 0;
+						padding-bottom: 0;
+						border: none;
+						&:hover { background-color: yewi.elevation(1); }
+					}
+					& arrow {
+						border: 16px;
+						background: none;
+					}
+				}
+				& stack {
+					border-top-right-radius: 16px;
+					border-bottom-right-radius: 16px;
+					background-color: yewi.elevation(1);
+				}
+			}
+		}
+	}
+}
+

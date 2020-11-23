@@ -1,0 +1,21 @@
+
+# Maintainer: Jack Johannesen
+
+pkgname=pack
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Just fuckin pack some files into a .tar.gz bro."
+arch=('any')
+url="https://github.com/K4rakara/utils"
+license=('MIT')
+depends=('lua' 'tar')
+provides=('pack')
+source=()
+md5sums=()
+
+package() {
+	install -Dm755 \
+		$srcdir/../../../cli/pack/index.lua \
+		$pkgdir/usr/bin/pack;
+}
+

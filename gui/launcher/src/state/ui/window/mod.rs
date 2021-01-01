@@ -1,18 +1,19 @@
 use crate::gtk;
 use crate::log;
-use crate::x11rb;
 use crate::interpolation;
+use crate::regex;
 
 use crate::state::data;
 use crate::event;
 pub mod vbox;
 
+use std::process::{ Command };
 use std::time::{ Duration, Instant };
 
 use gtk::prelude::*;
 use log::{ trace };
-use x11rb::{ connect, connection::{ Connection } };
 use interpolation::{ Ease, lerp };
+use regex::{ Regex };
 
 use event::{ Escalator };
 
@@ -32,20 +33,63 @@ pub struct State {
 
 impl State {
 	pub fn new(data: &data::State, win: &gtk::Window, escalator: &Escalator) -> Self {
-        let (screen_width, screen_height) = match connect(None) {
-			Ok((conn, screen_n)) => {
-				let screen = &conn.setup().roots[screen_n];
-				(screen.width_in_pixels, screen.height_in_pixels)
-			}
-			Err(e) => panic!(format!("\n\nFailed to connect to X11.\n\nDetails:\n\n{}\n\n", e)),
-		};
-
-		let width = ((screen_width as f32 / 100.0) * 25.0).round() as i32;
+        let (s_off_x, s_off_y, s_width, s_height) = (|| {
+            let try_output = Command::new("xrandr")
+                .arg("-q")
+                .output();
+            
+            let output = match try_output {
+                Ok(output) => output,
+                Err(error) => panic!(format!("\n\nFailed to run \"xrandr -q\".\n\nDetails:\n\n{}\n\n", error)),
+            };
+            
+            let stdout = match String::from_utf8(output.stdout) {
+                Ok(stdout) => stdout,
+                Err(error) => panic!(format!("\n\nFailed to convert a `Vec<u8>` to a `String`.\n\nDetails:\n\n{}\n\n", error)),
+            };
+            
+            let regex = Regex::new(r#"(?i)([a-z0-9\-_]+) connected(?: primary)? (\d+)x(\d+)\+(\d+)\+(\d+)"#).unwrap();
+           
+            for line in stdout.lines() {
+                if regex.is_match(line) {
+                    let caps = regex.captures(line).unwrap();
+                    let width = caps
+                        .get(2)
+                        .unwrap()
+                        .as_str()
+                        .parse::<u16>()
+                        .unwrap();
+                    let height = caps
+                        .get(3)
+                        .unwrap()
+                        .as_str()
+                        .parse::<u16>()
+                        .unwrap();
+                    let off_x = caps
+                        .get(4)
+                        .unwrap()
+                        .as_str()
+                        .parse::<u16>()
+                        .unwrap();
+                    let off_y = caps
+                        .get(4)
+                        .unwrap()
+                        .as_str()
+                        .parse::<u16>()
+                        .unwrap();
+                    return (off_x, off_y, width, height);
+                }
+            }
+            
+            panic!(String::from("\n\nNo display connected!\n\n"));
+        })();
+        
+		let width = ((s_width as f32 / 100.0) * 25.0).round() as i32;
 		let height = 0;
-
-		let x = 8;
-		let y = screen_height as i32 - 48 - height;
-
+        
+		let x = (s_off_x + 8) as i32;
+		let y = (s_off_y + s_height) as i32 - 48 - height;
+        
 		State {
 			inner: win.clone(),
 			vbox: vbox::State::new(&data, &win, &escalator),
@@ -53,15 +97,15 @@ impl State {
 			y: y,
 			width: width,
 			height: height,
-			screen_width: screen_width,
-			screen_height: screen_height,
+			screen_width: s_width,
+			screen_height: s_height,
             opacity: 0.0,
 			animation: Some(
 				Animation::new(
 					width, 0,
 					width, 400,
                     -1.0, 1.0,
-					screen_height,
+					s_height,
 					Duration::from_millis(500))),
 		}
 	}

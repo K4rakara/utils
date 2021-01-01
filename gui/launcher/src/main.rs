@@ -11,6 +11,7 @@ pub extern crate gtk;
 pub extern crate interpolation;
 pub extern crate pango;
 pub extern crate x11rb;
+pub extern crate regex;
 
 pub mod event;
 pub mod freedesktop;

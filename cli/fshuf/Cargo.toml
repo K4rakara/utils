@@ -1,0 +1,10 @@
+[package]
+name = "fshuf"
+version = "3.0.0"
+authors = ["Jack Johannesen <jack@insertdomain.name>"]
+edition = "2018"
+
+[dependencies]
+clap = "2.33"
+rand = "0.8"
+

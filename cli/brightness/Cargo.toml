@@ -1,6 +1,6 @@
 [package]
 name = "brightness"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Jack Johannesen <jack@insertdomain.name>"]
 edition = "2018"
 

@@ -33,6 +33,7 @@ impl TryFrom<&str> for Percent {
 
 fn main() {
     let args = args().collect::<Vec<String>>();
+    
     let percent = if args.len() >= 2 {
         match Percent::try_from(args[1].as_str()) {
             Ok(v) => v,
@@ -41,35 +42,31 @@ fn main() {
     } else {
         panic!("Expected a percent value");
     };
-    let current_display = {
-        let xrandr_query = {
-            let try_xrandr_query = Command::new("xrandr")
-                .arg("--query")
-                .envs(&mut vars())
-                .output();
-            match try_xrandr_query {
-                Ok(xrandr_query_output) => match String::from_utf8(xrandr_query_output.stdout) {
-                    Ok(xrandr_query) => xrandr_query,
-                    Err(e) => panic!(e),
-                }
+    
+    let xrandr_query = {
+        let try_xrandr_query = Command::new("xrandr")
+            .arg("--query")
+            .envs(&mut vars())
+            .output();
+        match try_xrandr_query {
+            Ok(xrandr_query_output) => match String::from_utf8(xrandr_query_output.stdout) {
+                Ok(xrandr_query) => xrandr_query,
                 Err(e) => panic!(e),
             }
-        };
-        let regex = Regex::new(r#"(?im)((?:[a-z0-9]+-?)+) connected .*?"#).unwrap();
-        match regex.captures(&xrandr_query) {
-            Some(caps) => match caps.get(1) {
-                Some(cap) => String::from(cap.as_str()),
-                None => panic!("IDFK how you got this error..."),
-            }
-            None => panic!("RegExp didn't work lol"),
+            Err(e) => panic!(e),
         }
     };
-    Command::new("xrandr")
-        .arg("--output")
-        .arg(current_display)
-        .arg("--brightness")
-        .arg(format!("{}", percent.0 / 100.0))
-        .output()
-        .unwrap();
+    
+    let regex = Regex::new(r#"(?i)([a-z0-9\-_]+) connected(?: primary)? .*?"#).unwrap();
+    for captures in regex.captures_iter(&xrandr_query) {
+        Command::new("xrandr")
+            .arg("--output")
+            .arg(captures.get(1).unwrap().as_str())
+            .arg("--brightness")
+            .arg(format!("{}", percent.0 / 100.0))
+            .output()
+            .unwrap(); 
+    }
+
 }
 

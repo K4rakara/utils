@@ -2,6 +2,7 @@ extern crate clap;
 extern crate rand;
 
 use std::error::{ Error };
+use std::env::{ self };
 use std::fmt::{ self };
 use std::fs::{ self, DirEntry };
 use std::io::{ self };
@@ -78,6 +79,11 @@ fn rem() -> Result<(), io::Error> {
 }
 
 fn main() {
+    if env::var("HOME").unwrap() == env::var("PWD").unwrap() {
+        println!("fshuf should NEVER, and I repeat NEVER be ran in ones home directory. I know this from experience.");
+        process::exit(1);
+    }
+    
     let matches = App::new("fshuf")
         .author("Jack Johannesen")
         .version("3.0.0")
